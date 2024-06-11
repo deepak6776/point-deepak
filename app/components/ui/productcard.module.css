@@ -1,0 +1,9 @@
+.pill{
+  display: grid;
+  place-items: center;
+  padding: 2px 8px;
+  border-radius: 32px;
+  border:1px solid gray;
+  min-width: 70px;
+  font-size: 12px;
+}
