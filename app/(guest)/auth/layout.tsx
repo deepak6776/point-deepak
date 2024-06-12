@@ -5,7 +5,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default async function AuthLayout({ children }: Props) {
+export default function AuthLayout({ children }: Props) {
   
 
   return (

@@ -6,6 +6,7 @@ import Fonts from "./Fonts";
 import MadeBySharpener from "@/app/components/MadeBySharpener";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import JoinUs from "@/app/components/JoinUs";
+import Notification from "./components/Notification";
 
 
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           <JoinUs />
           <MadeBySharpener />
           <Footer />
+          <Notification/>
         </Providers>
       </body>
       {/* <GoogleAnalytics gaId="G-W4XNWDJSC8"/> */}

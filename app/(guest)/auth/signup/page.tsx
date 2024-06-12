@@ -1,31 +1,121 @@
 "use client"
 import AuthFormContainer from '@/app/components/AuthFormContainer'
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Box, Button, Flex, FormControl, FormLabel, Heading, Input, Text, VStack } from '@chakra-ui/react'
 import { useFormik } from 'formik'
 import Link from 'next/link'
+import * as yup from 'yup'
+import { filterFormikErrors } from '@/app/utils/formikHelpters';
 
+
+const validationSchema = yup.object().shape({
+  name: yup.string().required("Name is required!"),
+  email: yup.string().email("Invalid email!").required("Email is required!"),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters.")
+    .required("Password is required!"),
+  // cpassword: yup
+  //   .string()
+  //   .required("Please confirm your password")
+  //   .oneOf([yup.ref('password')], "Passwords don't match.")
+});
 
 export default function SignUpPage() {
   const { values, handleChange, handleBlur, handleSubmit,
     isSubmitting, errors, touched } = useFormik({
-      initialValues: { name: '', email: '', password: '' },
-      onSubmit: (values) => {
-        console.log(values);
+      initialValues: { name: '', email: '', password: '', cpassword: '' },
+      validationSchema,
+      onSubmit: async (values, action) => {
+        // console.log(values);
+        action.setSubmitting(true);
+        await fetch("/api/users", {
+          method: "POST",
+          body: JSON.stringify(values),
+        }).then(async (res) =>{
+          if(res.ok){
+            const result = await res.json();
+            console.log(result)
+          }
+          action.setSubmitting(false);
+        });
       }
     })
 
-  const formErrors: string[] = [];
-
-  const { email, name, password } = values;
+  const formErrors: string[] = filterFormikErrors(errors, touched, values);
+  const { email, name, password, cpassword } = values;
 
 
   return (
     <Flex className={`basePadding`} minHeight="100vh" alignItems="center" justifyContent="center">
       <Box width={{ base: '100%', sm: '80%', md: '50%', lg: '35%' }} p={{ base: '24px', md: '48px' }} rounded="lg" border="1px solid black">
         <Heading>Sign Up</Heading>
-        <form onSubmit={handleSubmit}>
-        {/* <AuthFormContainer title='Sign Up' onSubmit={handleSubmit}> */}
-          <VStack mt='20px'>
+        {/* <form onSubmit={handleSubmit}> */}
+        <AuthFormContainer onSubmit={handleSubmit}>
+
+          <FormLabel htmlFor='name'>Name</FormLabel>
+          <Input
+            name="name"
+            id="Name"
+            value={name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+
+          />
+
+          <FormLabel htmlFor='email'>Email</FormLabel>
+          <Input
+            name="email"
+            id="Email"
+            value={email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+
+          />
+          <FormLabel htmlFor='password'>Password</FormLabel>
+          <Input
+            name="password"
+            id="Password"
+            value={password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+
+            type="password"
+          />
+          <FormLabel htmlFor='cpassword'>Confirm Password</FormLabel>
+          {/* <Input
+            name="cpassword"
+            id="cpassword"
+            value={cpassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+
+            type="password"
+          /> */}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            Sign Up
+          </Button>
+          <Link href='/auth/signin'>
+            <Text textDecoration="underline" mt='10px'>Sign In</Text>
+          </Link>
+          <Link href='/'>
+            <Text textDecoration="underline" mt='10px'>Back to Home</Text>
+          </Link>
+          <div className="">
+            {formErrors.map((err) => {
+              return (
+                <div key={err} className="space-x-1 flex items-center text-red-500">
+                  <XMarkIcon className="w-4 h-4" />
+                  <p className="text-xs">{err}</p>
+                </div>
+              );
+            })}
+          </div>
+        </AuthFormContainer>
+
+        {/* </form> */}
+
+        {/* <VStack mt='20px'>
             <FormControl>
               <FormLabel htmlFor='name'>Name</FormLabel>
               <Input
@@ -64,9 +154,8 @@ export default function SignUpPage() {
             <Link href='/'>
               <Text textDecoration="underline" mt='10px'>Back to Home</Text>
             </Link>
-          </VStack>
-        </form>
-        {/* </AuthFormContainer> */}
+          </VStack> */}
+
 
 
 
