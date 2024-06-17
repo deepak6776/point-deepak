@@ -7,6 +7,7 @@ import MadeBySharpener from "@/app/components/MadeBySharpener";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import JoinUs from "@/app/components/JoinUs";
 import Notification from "./components/Notification";
+import AuthSession from "./components/AuthSession";
 
 
 
@@ -17,6 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <AuthSession>
     <html lang="en">
       <head>
         <title>Point</title>
@@ -27,13 +29,14 @@ export default function RootLayout({
         <Providers>
           <Fonts />
           {children}
-          <JoinUs />
-          <MadeBySharpener />
-          <Footer />
+          {/* <JoinUs /> */}
+          {/* <MadeBySharpener /> */}
+          {/* <Footer /> */}
           <Notification/>
         </Providers>
       </body>
       {/* <GoogleAnalytics gaId="G-W4XNWDJSC8"/> */}
     </html>
+    </AuthSession>
   );
 }

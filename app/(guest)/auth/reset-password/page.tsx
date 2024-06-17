@@ -1,33 +1,37 @@
 import { Box, Button, Flex, FormControl, FormLabel, Heading, Input, Text, VStack } from '@chakra-ui/react'
 import { Field } from 'formik'
 import Link from 'next/link'
-import React from 'react'
+import UpdatePassword from "@/app/components/UpdatePassword";
+import startDb from "@/app/lib/db";
+import PasswordResetTokenModel from "@/app/models/passwordResetTokenModel";
+import { redirect } from "next/navigation";
+import React from "react";
 
-export default function ResetPasswordPage() {
-    return (
-        <Flex className={`basePadding`} minHeight="100vh" alignItems="center" justifyContent="center">
-            <Box width={{ base: '100%', sm: '80%', md: '50%', lg: '35%' }} p={{ base: '24px', md: '48px' }} rounded="lg" border="1px solid black">
-                <Heading>Reset Password</Heading>
-                <form>
-                    <VStack mt='20px'>
-                        <FormControl>
-                            <FormLabel htmlFor='password'>Password</FormLabel>
-                            <Input name="password" id="password" type="password" />
-                        </FormControl>
-                        <FormControl>
-                            <FormLabel htmlFor='confirm'>Confirm Password</FormLabel>
-                            <Input name="cofirm" id="confirm" type="password" />
-                        </FormControl>
-                        <Button type='submit' width="100%" mt='20px'>Submit</Button>
-                        <Link href='/'>
-                            <Text textDecoration="underline" mt='10px'>Back to Home</Text>
-                        </Link>
-                    </VStack>
-                </form>
+interface Props {
+    searchParams: {
+        token: string;
+        userId: string;
+    };
+}
 
+const fetchTokenValidation = async (token: string, userId: string) => {
+    await startDb();
+    const resetToken = await PasswordResetTokenModel.findOne({ user: userId });
+    if (!resetToken) return null;
 
+    const matched = await resetToken.compareToken(token);
+    if (!matched) return null;
 
-            </Box>
-        </Flex>
-    )
+    return true;
+};
+
+export default async function ResetPasswordPage({ searchParams }: Props) {
+    const { token, userId } = searchParams;
+
+    if (!token || !userId) return redirect("/404");
+
+    const isValid = await fetchTokenValidation(token, userId);
+    if (!isValid) return redirect("/404");
+    
+    return <UpdatePassword token={token} userId={userId} />;
 }

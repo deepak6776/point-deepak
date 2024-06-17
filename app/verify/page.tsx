@@ -24,17 +24,17 @@ export default function Verify(props: Props) {
           console.log(message);
           if (res.ok) {
             // success
-            console.log(message);
-            // toast.success(message);
-            // router.replace("/");
+            // console.log(message);
+            toast.success(message);
+            router.replace("/");
           }
     
           if (!res.ok && error) {
             console.error(error);
-            // toast.error(error);
+            toast.error(error);
           }
     
-          // router.replace("/");
+          router.replace("/");
         });
       }, []);
 

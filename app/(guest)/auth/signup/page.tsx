@@ -6,6 +6,8 @@ import { useFormik } from 'formik'
 import Link from 'next/link'
 import * as yup from 'yup'
 import { filterFormikErrors } from '@/app/utils/formikHelpters';
+import { toast } from 'react-toastify';
+import { signIn } from 'next-auth/react';
 
 
 const validationSchema = yup.object().shape({
@@ -29,18 +31,27 @@ export default function SignUpPage() {
       onSubmit: async (values, action) => {
         // console.log(values);
         action.setSubmitting(true);
-        await fetch("/api/users", {
+        const res = await fetch("/api/users", {
           method: "POST",
           body: JSON.stringify(values),
-        }).then(async (res) =>{
-          if(res.ok){
-            const result = await res.json();
-            console.log(result)
-          }
-          action.setSubmitting(false);
         });
-      }
-    })
+
+        const { message, error } = (await res.json()) as {
+          message: string;
+          error: string;
+        };
+
+        if (res.ok) {
+          toast.success(message);
+          await signIn("credentials", { email, password });
+        }
+  
+        if (!res.ok && error) {
+          toast.error(error);
+        }
+        action.setSubmitting(false);
+      },
+    });
 
   const formErrors: string[] = filterFormikErrors(errors, touched, values);
   const { email, name, password, cpassword } = values;
